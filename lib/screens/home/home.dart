@@ -18,9 +18,10 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  
   List<Comment> comments = [];
   bool isCommentsLoading = true;
-  late MaskEmailModel homeProv;
+  bool maskEmail = false;
   getComments() async {
     List<Comment>? temp = await fetchComments(context);
     if (temp != null) {
@@ -80,7 +81,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               : ListView.builder(
                   itemCount: comments.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return CommentCard(comment: comments[index]);
+                    return CommentCard(comment: comments[index],maskEmail: ref.watch(homeProvider.notifier).fetchVal() ,);
                   },
                 ),
         ),

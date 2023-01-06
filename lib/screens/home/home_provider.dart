@@ -9,7 +9,21 @@ class LeaveNotifier extends StateNotifier<MaskEmailModel> {
   Ref ref;
   LeaveNotifier(this.ref) : super(MaskEmailModel.init());
 
-  updateEmailMaskFlag() {}
+  init() async {
+    final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
+      fetchTimeout: const Duration(seconds: 1),
+      minimumFetchInterval: const Duration(seconds: 1),
+    ));
+
+    await remoteConfig.fetchAndActivate();
+    state = state.copyWith(remoteConfig: remoteConfig);
+  }
+
+  bool fetchVal(){
+    init();
+    return state.remoteConfig.getBool("is_mask_email");
+  }
 }
 
 class MaskEmailModel {
@@ -20,15 +34,6 @@ class MaskEmailModel {
   factory MaskEmailModel.init() {
     bool isMaskEmail = false;
     final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
-    Future<void> initConfig() async {
-      await remoteConfig.setConfigSettings(RemoteConfigSettings(
-        fetchTimeout: const Duration(seconds: 1),
-        minimumFetchInterval: const Duration(seconds: 10),
-      ));
-
-      await remoteConfig.fetchAndActivate();
-    }
-    initConfig();
     return MaskEmailModel(isMaskEmail: isMaskEmail, remoteConfig: remoteConfig);
   }
 

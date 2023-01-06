@@ -7,11 +7,23 @@ import 'package:google_fonts/google_fonts.dart';
 
 class CommentCard extends ConsumerWidget {
   final Comment comment;
-  const CommentCard({required this.comment, super.key});
+  final bool maskEmail;
+  const CommentCard({required this.comment, this.maskEmail = false, super.key});
 
   String maskString( String email){
     String partOne = email.split("@")[0];
-    return "${partOne.substring(0,3)}${partOne.substring(3)}@${email.split("@")[1]}";
+    if(partOne.length > 3){
+      String partTwo = partOne.substring(3);
+    String temp = "";
+    for (int i = 0; i < partOne.substring(3).length; i++) {
+      temp += "*";
+    }
+    partTwo.replaceRange(0, partTwo.length - 1, temp);
+    return "${partOne.substring(0,3)}${partTwo.replaceRange(0,null, temp)}@${email.split("@")[1]}";
+    } else {
+      return email;
+    }
+    
   }
 
   @override
@@ -84,7 +96,7 @@ class CommentCard extends ConsumerWidget {
                         fontSize: 14),
                     children: <TextSpan>[
                       TextSpan(
-                        text: ref.watch(homeProvider).remoteConfig.getBool("is_mask_email") ? maskString(comment.email ?? "") : comment.email,
+                        text: maskEmail ? maskString(comment.email ?? "") : comment.email,
                         style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontStyle: FontStyle.normal,
